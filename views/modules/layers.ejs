@@ -1,0 +1,125 @@
+<script type="text/javascript">
+
+    var tracks, trackObj;
+
+    $.ajax({
+        dataType: 'json',
+        url: geoTracks,
+        type: 'GET',
+        async: false,
+        success: function (result) {
+            if (result instanceof Object) {
+                tracks = result.collections.slice();
+            } else {
+
+            }
+        },
+        error: function (request, status, error) {
+            alert("REST API로부터 데이터를 받아올 수 없습니다.");
+        }
+    });
+    //console.log(tracks);
+
+    var mainGroups = new Array(tracks.length);
+    for(var i=0; i<tracks.length; i++) {
+        var temp = new ol.layer.Group({
+            // A layer must have a title to appear in the layerswitcher
+            title: tracks[i].name,
+            groupClass: 'top',
+            // Adding a 'fold' property set to either 'open' or 'close' makes the group layer
+            // collapsible
+            fold: 'open'
+        });
+        mainGroups.push(temp);
+    }
+
+    var subGroups;
+    var innerGroups;
+
+    var innerSubGroups;
+
+    mainGroups.forEach(function(item){//console.log(item.values_.title);
+        subGroups = new Array();
+        innerGroups = new ol.Collection();
+        innerSubGroups = new Array();
+
+        $.ajax({
+            dataType: 'json',
+            url: geoTrackObjAbbr+item.values_.title,
+            type: 'GET',
+            async: false,
+            success: function (result) {
+                if (result instanceof Object && result.collections != null) {
+                    trackObj = result.collections.slice();
+                } else {
+                    trackObj = [];
+                }
+            },
+            error: function (request, status, error) {
+                alert("REST API로부터 데이터를 받아올 수 없습니다.");
+            }
+        });
+
+        for(var i=0; i<trackObj.length; i++) {          
+            var colorCode = "#" + Math.round(Math.random() * 0xffffff).toString(16);
+
+            innerSubGroups[i] = new ol.Collection();
+            innerSubGroups[i].push(new ol.layer.Vector({
+                title: 'Tracks',
+                mainTitle: item.get('title'),
+                subTitle: trackObj[i].class_id,
+                groupClass: 'bottom',
+                visible: false,
+                zIndex: 100,        
+                style: new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                        color: colorCode,
+                        width: 2
+                    })
+                }),
+                source: null
+            }));
+            innerSubGroups[i].push(new ol.layer.Vector({
+                title: 'Points',
+                mainTitle: item.get('title'),
+                subTitle: trackObj[i].class_id,
+                groupClass: 'bottom',
+                visible: false,
+                zIndex: 100,              
+                style: new ol.style.Style({                                
+                    image: new ol.style.Circle({
+                        radius: 5,
+                        snapToPixel: false,                        
+                        stroke: new ol.style.Stroke({
+                            color: colorCode, 
+                            width: 2
+                        })
+                    })
+                }),
+                source: null
+            }));
+            
+            var temp = new ol.layer.Group({
+                // A layer must have a title to appear in the layerswitcher
+                title: trackObj[i].class_id,
+                // Adding a 'fold' property set to either 'open' or 'close' makes the group layer
+                // collapsible
+                fold: 'close'
+            });
+            subGroups.push(temp);
+            subGroups[i].setLayers(innerSubGroups[i]);
+
+            innerGroups.push(subGroups[i]);
+        }
+
+        item.setLayers(innerGroups);
+
+        map.addLayer(item);
+    });
+    
+    var sidebar = new ol.control.Sidebar({ element: 'sidebar', position: 'left' });
+    var toc = document.getElementById("layers");
+    ol.control.LayerSwitcher.renderPanel(map, toc);
+    map.addControl(sidebar);
+
+</script>
