@@ -486,7 +486,7 @@ var LayerSwitcher = function (_Control) {
                     _input.id = checkboxId;
                     _input.checked = lyr.getVisible();
                     _input.indeterminate = lyr.get('indeterminate');
-                    _input.onchange = function (e) {                        
+                    _input.onchange = function (e) {                
                         for(var a=0; a<lyr.getLayers().array_.length; a++) {
                             var tempSubTrackLyr;
                             var tempSubPointLyr;
@@ -497,13 +497,14 @@ var LayerSwitcher = function (_Control) {
 
                                 if(tempSubTrackLyr.get('source') == null || tempSubPointLyr.get('source') == null) {
                                     var trackSrc, pointSrc;
-            
+                                    $('#div_load_image').show();
                                     $.ajax({
                                         dataType: 'json',
                                         url: geoTrackObj+tempSubTrackLyr.get('mainTitle')+'?classId='+tempSubTrackLyr.get('subTitle'),
                                         type: 'GET',
-                                        async: false,
+                                        //async: false,
                                         success: function (result) {
+                                            $('#div_load_image').hide();
                                             if (result instanceof Object) {                        
                                                 if (result.features != null) {
                                                     trackSrc = new ol.source.Vector({
@@ -542,6 +543,23 @@ var LayerSwitcher = function (_Control) {
                                                         }    
                                                     }
                                                 }
+                                                tempSubTrackLyr.set('source', trackSrc);
+                                                tempSubPointLyr.set('source', pointSrc);                                    
+
+                                                if (e.target.checked) {
+                                                    var pathTemp = new Array();                     
+                                                    tempLyr = tempSubTrackLyr;
+                    
+                                                    if (tempSubTrackLyr.get('source').getState() === 'ready') {
+                                                        for (var i = 0; i < tempSubTrackLyr.get('source').getFeatures().length; i++) {
+                                                            pathTemp.push(tempSubTrackLyr.get('source').getFeatures()[i]);                                    
+                                                        }
+                                                        pathMap.set(tempSubTrackLyr.ol_uid, pathTemp);
+                                                    }
+                                                } else {
+                                                    pathMap.delete(tempSubTrackLyr.ol_uid);
+                                                }
+
                                             } else {
                                                 alert("REST API로부터 전달받은 데이터가 객체 타입이 아닙니다.");
                                             }
@@ -550,32 +568,15 @@ var LayerSwitcher = function (_Control) {
                                             alert("REST API로부터 데이터를 받아올 수 없습니다.");
                                         }
                                     });
-                                    
-                                    tempSubTrackLyr.set('source', trackSrc);
-                                    tempSubPointLyr.set('source', pointSrc);                                    
                                 }
-
-                                if (e.target.checked) {
-                                    var pathTemp = new Array();                     
-                                    tempLyr = tempSubTrackLyr;
-    
-                                    if (tempSubTrackLyr.get('source').getState() === 'ready') {
-                                        for (var i = 0; i < tempSubTrackLyr.get('source').getFeatures().length; i++) {
-                                            pathTemp.push(tempSubTrackLyr.get('source').getFeatures()[i]);                                    
-                                        }
-                                        pathMap.set(tempSubTrackLyr.ol_uid, pathTemp);
-                                    }
-                                } else {
-                                    pathMap.delete(tempSubTrackLyr.ol_uid);
-                                }
-                            } else {
+                            } else {console.log(lyr.getLayers().array_.length);
                                 if (lyr.getLayers().array_[a].getLayers().array_[0].get('title') == 'Tracks' || lyr.getLayers().array_[a].getLayers().array_[1].get('title') == 'Points') {
                                     tempSubTrackLyr = lyr.getLayers().array_[a].getLayers().array_[0];
                                     tempSubPointLyr = lyr.getLayers().array_[a].getLayers().array_[1];
 
                                     if(tempSubTrackLyr.get('source') == null || tempSubPointLyr.get('source') == null) {
                                         var trackSrc, pointSrc;
-                
+                                        
                                         $.ajax({
                                             dataType: 'json',
                                             url: geoTrackObj+tempSubTrackLyr.get('mainTitle')+'?classId='+tempSubTrackLyr.get('subTitle'),
@@ -701,7 +702,7 @@ var LayerSwitcher = function (_Control) {
                 input.onchange = function (e) {
                     if(lyr.get('source') == null) {
                         var trackSrc, pointSrc;
-
+alert("67676");
                         $.ajax({
                             dataType: 'json',
                             url: geoTrackObj+lyr.get('mainTitle')+'?classId='+lyr.get('subTitle'),

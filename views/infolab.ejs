@@ -3,6 +3,8 @@
 
 <% include ./headers/header %>
 <script type="text/javascript">
+
+
 function fn_submit(){
     if($("#insertScript").val() == ""){
         alert("Script 영역에 JSON Script를 입력하십시오.");
@@ -11,12 +13,17 @@ function fn_submit(){
 
     $.ajax({        
         url: geoTracks,
-        async: false,
+        //async: false,
         type: 'POST',
         data: $("#insertScript").val(),
         dataType: 'json',        
         contentType: "application/json",
+        beforeSend  : function(){
+            $('#div_load_image').show();
+        },
         success: function (result) {
+            $('#div_load_image').hide();
+            
             alert("Track insert is success.");
             window.location.reload();
         },
@@ -25,8 +32,39 @@ function fn_submit(){
         }
     });
 }
+
+function fn_query(){
+    // Deep Zone 연계 호출
+    $.ajax({        
+        url: dmzTracks,
+        //async: false,
+        type: 'POST',
+        data: $('#insertQuery').val(),
+        dataType: 'json',        
+        contentType: "application/json",
+        beforeSend  : function(){
+            $('#div_load_image').show();
+        },
+        success: function (result) {
+            $('#div_load_image').hide();
+
+            alert("Track insert is success.");
+            window.location.reload();
+        },
+        error: function (request, status, error) {
+            alert("REST API로부터 데이터를 받아올 수 없습니다.");
+        }
+    });
+}
+
+
+
 </script>
 <body>
+    <div id="div_load_image" style="position:absolute; top:32%; left:42%;width:0px;height:0px; z-index:9999; background:rgba(0,60,136,.5); filter:alpha(opacity=50); opacity:alpha*0.5; margin:auto; padding:0; text-align:center">
+        <img src="/images/loading.gif" style="width:300px; height:300px;">
+    </div>
+
     <!-- START OF SIDEBAR DIV -->
     <div id="sidebar" class="sidebar">
 
@@ -56,9 +94,21 @@ function fn_submit(){
 
             <div class="sidebar-pane" id="trackTimes">
                 <h2 class="sidebar-header">
-                    TrackTimeLines
+                    Deep Zones Insert
                     <span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
                 </h2>
+                <div id="trackQuery">
+                    <div style="margin-top:10px;margin-bottom:20px;">Deep Zones Insert(JSON)</div>
+                    <textarea id="insertQuery" cols="33" rows="30">
+{
+    "table_name": "temp_table_1",
+    "sql": "SELECT * FROM d_mprocess('/home/project/etri_videos/SC0004603_카메라(3번)_20200619_160002(엑스포광학공원방면).mp4')"
+}                      
+                    </textarea>
+                    <div style="padding:10px;text-align:center;">
+                        <button type="button" class="btn btn-success" onclick="javascript:fn_query()">Query 실행</button>                        
+                    </div>                    
+                </div>
             </div>
 
             <div class="sidebar-pane" id="info">
@@ -69,7 +119,9 @@ function fn_submit(){
                 <div id="trackInsert">                    
                     <div style="margin-top:10px;margin-bottom:20px;">Track Insert(JSON)</div>
                     <textarea id="insertScript" cols="33" rows="30" placeholder="Script 영역"></textarea>
-                    <div><button type="button" style="background-color: #4CAF50;" onclick="javascript:fn_submit()">Create!</button></div>                    
+                    <div style="padding:10px;text-align:center;">
+                        <button type="button" class="btn btn-success" onclick="javascript:fn_submit()">Json 실행</button>                    
+                    </div>
                     <div style="margin-top:10px;margin-bottom:20px;">Sample</div>
                     <div style="width:250px;border:1px solid black">{
                         <br>&nbsp;&nbsp;
@@ -105,10 +157,13 @@ function fn_submit(){
     <!-- END OF SIDEBAR DIV -->
 
     <!-- DIV pour la carte -->
-    <div id="map" class="sidebar-map"></div>
+    <div id="map" class="sidebar-map">
+    </div>
     
     
     <script type="text/javascript">
+        
+        $('#div_load_image').hide();
 
         var view = new ol.View({
             projection: 'EPSG:4326',
@@ -116,42 +171,42 @@ function fn_submit(){
             zoom: 19
         });
 
+        var layers = [
+            new ol.layer.Tile({
+                // A layer must have a title to appear in the layerswitcher
+                title: 'VWorld 2D',
+                // Again set this layer as a base layer
+                type: 'base',
+                visible: true,
+                source: new ol.source.XYZ({
+                    url: 'http://xdworld.vworld.kr:8080/2d/Base/service/{z}/{x}/{y}.png'
+                })
+            }),
+            new ol.layer.Tile({
+                // A layer must have a title to appear in the layerswitcher
+                title: 'VWorld 2D 위성지도',
+                // Again set this layer as a base layer
+                type: 'base',
+                visible: false,
+                source: new ol.source.XYZ({
+                    url: 'http://xdworld.vworld.kr:8080/2d/Satellite/service/{z}/{x}/{y}.jpeg'
+                })
+            }),
+            new ol.layer.Tile({
+                // A layer must have a title to appear in the layerswitcher
+                title: 'OSM',
+                // Again set this layer as a base layer
+                type: 'base',
+                visible: false,
+                source: new ol.source.OSM()
+            })
+        ];
+
         var map = new ol.Map({
             target: 'map',
-            layers: [
-                new ol.layer.Tile({
-                    // A layer must have a title to appear in the layerswitcher
-                    title: 'VWorld 2D',
-                    // Again set this layer as a base layer
-                    type: 'base',
-                    visible: true,
-                    source: new ol.source.XYZ({
-                        url: 'http://xdworld.vworld.kr:8080/2d/Base/service/{z}/{x}/{y}.png'
-                    })
-                }),
-                new ol.layer.Tile({
-                    // A layer must have a title to appear in the layerswitcher
-                    title: 'VWorld 2D 위성지도',
-                    // Again set this layer as a base layer
-                    type: 'base',
-                    visible: false,
-                    source: new ol.source.XYZ({
-                        url: 'http://xdworld.vworld.kr:8080/2d/Satellite/service/{z}/{x}/{y}.jpeg'
-                    })
-                }),
-                new ol.layer.Tile({
-                    // A layer must have a title to appear in the layerswitcher
-                    title: 'OSM',
-                    // Again set this layer as a base layer
-                    type: 'base',
-                    visible: false,
-                    source: new ol.source.OSM()
-                })
-            ],
+            layers: layers,
             view: view
         });
-
-        
       
     </script>
 

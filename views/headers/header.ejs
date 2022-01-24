@@ -14,8 +14,8 @@
     <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList"></script>
     
     <!-- ol-ext -->
-    <link rel="stylesheet" href="/gis/ol-ext/ol-ext.min.css" />
-    <script type="text/javascript" src="/gis/ol-ext/ol-ext.min.js"></script>
+    <link rel="stylesheet" href="/gis/ol-ext/ol-ext.css" />
+    <script type="text/javascript" src="/gis/ol-ext/ol-ext.js"></script>
 
     <!-- <link rel="stylesheet" href="/gis/ol-ext/styles/style.css" /> -->
     <link rel="stylesheet" href="/gis/ol-ext/styles/css/fontmaki.css" />
@@ -23,6 +23,15 @@
     
     <!-- jQuery -->
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+
+    <!-- Bootstrap Area -->
+    <!-- 합쳐지고 최소화된 최신 CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <!-- 부가적인 테마 -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+    <!-- 합쳐지고 최소화된 최신 자바스크립트 -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <!-- Bootstrap Area-->
 
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -97,5 +106,14 @@
 		{	right: 50%;
 			top: 0.5em;
 		}
+
+        .backdrop{
+            width: 300px;
+            height: 300px;
+            border-radius: 30px;
+            background-color: rgba(255,255,192,0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 2px 7px 15px 8px rgba(0,0,0,0.3);
+        }
     </style>
 </head>

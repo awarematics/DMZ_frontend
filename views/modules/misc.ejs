@@ -33,28 +33,12 @@
     });
     map.addControl(dialogPrompt);
 
+    // ProgressBar
+    var progress = new ol.control.ProgressBar({
+        // target: $('.options').get(0)
+        //label: 'Map loading...',
+        layers: layers
+    });
+    map.addControl(progress);
 
-    // Progress dialog
-    var dialogProgress = new ol.control.Dialog();
-    dialogProgress.setContent({
-        content: 'Processing...',
-        title: 'Progress',
-        max: 10
-    });
-    dialogProgress.on('show', function () {
-        dialogMap.close();
-        function step(i) {
-            dialogProgress.setProgress(i);
-            if (i < 10) {
-                setTimeout(function () {
-                    step(i + 1);
-                }, 500);
-            } else {
-                dialogMap.show('End of progress...');
-                dialogProgress.hide();
-            }
-        }
-        step(0);
-    });
-    map.addControl(dialogProgress);
 </script>
