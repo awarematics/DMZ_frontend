@@ -48,7 +48,8 @@ function fn_query(){
         success: function (result) {
             $('#div_load_image').hide();
 
-            alert("Track insert is success.");
+            alert("Deep 분석 완료.");
+            //$('#completeModal').modal('show');
             window.location.reload();
         },
         error: function (request, status, error) {
@@ -56,8 +57,6 @@ function fn_query(){
         }
     });
 }
-
-
 
 </script>
 <body>
@@ -72,7 +71,7 @@ function fn_query(){
         <div class="sidebar-tabs">
             <ul role="tablist">
                 <li class="active"><a href="#tracks" role="tab"><i class="fa fa-map"></i></a></li>
-                <li><a href="#trackTimes" role="tab"><i class="fa fa-play"></i></a></li>
+                <li><a href="#trackTimes" role="tab"><i class="fa fa-quora"></i></a></li>
                 <li><a href="#info" role="tab"><i class="fa fa-plus"></i></a></li>
                 <li><a href="https://github.com/awarematics/DMZ_frontend" role="tab" target="_blank"><i
                             class="fa fa-github"></i></a></li>
@@ -99,14 +98,29 @@ function fn_query(){
                 </h2>
                 <div id="trackQuery">
                     <div style="margin-top:10px;margin-bottom:20px;">Deep Zones Insert(JSON)</div>
-                    <textarea id="insertQuery" cols="33" rows="30">
+                    <div style="margin-bottom:20px;">
+                        Deep 영상 : 
+                        <span>
+                            <select name="deepMovie" id="deepMovie">
+                                <option value="">선택</option>
+                                <option value="1">대덕터널입구방면</option>
+                                <option value="2">대덕중학교방면</option>
+                                <option value="3">엑스포광학공원방면</option>
+                                <option value="4">한국표준과학연구원방면</option>
+                            </select>
+                        </span>
+                    </div>
+                    <textarea id="insertQuery" cols="33" rows="10">
 {
-    "table_name": "temp_table_1",
-    "sql": "SELECT * FROM d_mprocess('/home/project/etri_videos/SC0004603_카메라(3번)_20200619_160002(엑스포광학공원방면).mp4')"
+    "table_name": 
+    "sql": 
 }                      
                     </textarea>
+                    <!--
+                        "SELECT * FROM d_mprocess('/home/project/etri_videos/SC0004603_카메라(3번)_20200619_160002(엑스포광학공원방면).mp4')"
+                    -->
                     <div style="padding:10px;text-align:center;">
-                        <button type="button" class="btn btn-success" onclick="javascript:fn_query()">Query 실행</button>                        
+                        <button type="button" class="btn btn-success" onclick="javascript:fn_query()">Query 실행</button> 
                     </div>                    
                 </div>
             </div>
@@ -158,12 +172,42 @@ function fn_query(){
 
     <!-- DIV pour la carte -->
     <div id="map" class="sidebar-map">
+
     </div>
-    
     
     <script type="text/javascript">
         
         $('#div_load_image').hide();
+
+        $('#deepMovie').change(function() {
+            var tbl = '';
+            var sql = '';
+
+            switch($('#deepMovie').val()) {
+                case '1':
+                    tbl = "dmz_tbl1";
+                    sql = "SELECT * FROM d_mprocess('/home/project/etri_videos/SC0004601_카메라(1번)_20200619_160000(대덕터널입구방면).mp4')";
+                    break;
+                case '2':
+                    tbl = "dmz_tbl2";
+                    sql = "SELECT * FROM d_mprocess('/home/project/etri_videos/SC0004602_카메라(2번)_20200619_160002(대덕중학교방면).mp4')";
+                    break;
+                case '3':
+                    tbl = "dmz_tbl3";
+                    sql = "SELECT * FROM d_mprocess('/home/project/etri_videos/SC0004603_카메라(3번)_20200619_160002(엑스포광학공원방면).mp4')";
+                    break;
+                case '4':
+                    tbl = "dmz_tbl4";
+                    sql = "SELECT * FROM d_mprocess('/home/project/etri_videos/SC0004604_카메라(4번)_20200619_160000(한국표준과학연구원방면).mp4')";
+                    break;                    
+            }
+
+            var tempJson = {
+                "table_name": tbl,
+                "sql": sql
+            }  
+            $('#insertQuery').val(JSON.stringify(tempJson));
+        });
 
         var view = new ol.View({
             projection: 'EPSG:4326',
@@ -219,6 +263,8 @@ function fn_query(){
 <% include ./modules/animate %>
 
 <% include ./modules/misc %>
+
+<% include ./modules/modals %>
 
 </body>
 
